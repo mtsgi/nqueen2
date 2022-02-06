@@ -1,5 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
+
   import type { putPosition } from "./types";
   export let board :number[][];
 
@@ -35,7 +36,7 @@
     display: grid;
     grid-auto-rows: 32px;
     gap: 8px;
-    justify-content: left;
+    justify-content: safe center;
     align-items: stretch;
     box-sizing: border-box;
 
@@ -44,14 +45,19 @@
       border-radius: 3px;
       border: 2px solid #f0f0f0;
       line-height: 32px;
+      transition: .2s all ease;
+      transform: rotateX(180deg);
+      color: #ffffff;
 
       &:hover {
         border: 2px solid #d0d0d0;
       }
 
       &.filled {
+        cursor: default;
         border: none;
-        background: #ffa2a2;
+        background: #54a6f3;
+        transform: rotateX(0deg);
 
         &:hover {
           border: none

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { fade, slide } from 'svelte/transition';
+
   import logo from './assets/nqueen_logo.png'
   import engine from './assets/queen_engine.png'
   import type { putPosition } from "./lib/types";
@@ -11,7 +13,15 @@
   let queenCount = 0;
   let fillCount = 0;
 
+  // Game Status
+  let isCleared = false;
+  let isFailed = false;
+
+  let tweetUrl = '';
+
   const onStart = () => {
+    queenCount = 0;
+    fillCount = 0;
     board = new Array();
 
     for (let i = 0; i < n; i++) {
@@ -54,7 +64,24 @@
           }
         });
       }
+
+      if (queenCount === n) {
+        isCleared = true;
+        const squares = board.map(
+          row => row.map(item => item === 2 ? "🟦" : "⬜").join("")
+        ).join("%0a");
+        tweetUrl = `https://twitter.com/intent/tweet?text=${n}-Queen%0a%0a${squares}`;
+      }
+
+      else if (fillCount === n * n) {
+        isFailed = true;
+      }
     }
+  }
+
+  const closeWindow = () => {
+    isCleared = false;
+    isFailed = false;
   }
 </script>
 
@@ -62,8 +89,10 @@
   <header>
     <img src={logo} alt="N Queen 2" />
 
-    <input type=number bind:value={n} min=4 />
-    <button on:click={onStart}>Start</button>
+    <div class="form">
+      <input type=number bind:value={n} min=4 />
+      <button on:click={onStart}>Start</button>
+    </div>
   </header>
 
   <div class="wrapper">
@@ -71,8 +100,42 @@
   </div>
 
   <footer>
+    <div class="stats">
+      Queen {queenCount}/{n}
+      |
+      Filled {fillCount}/{n*n}
+    </div>
     <img src={engine} alt="Queen Engine 3" />
   </footer>
+
+  {#if isCleared}
+    <div class="window" transition:fade|local>
+      <div class="window__card" transition:slide|local>
+        <h2>Cleared!</h2>
+        <a
+          href={tweetUrl}
+          target="_blank"
+          class="window__card--tweet"
+        >Tweet</a>
+        <button
+          class="window__card--close"
+          on:click={closeWindow}
+        >close</button>
+      </div>
+    </div>
+  {/if}
+
+  {#if isFailed}
+    <div class="window" transition:fade|local>
+      <div class="window__card" transition:slide|local>
+        <h2>Failed...</h2>
+        <button
+          class="window__card--close"
+          on:click={closeWindow}
+        >close</button>
+      </div>
+    </div>
+  {/if}
 </main>
 
 <style lang="scss">
@@ -88,49 +151,112 @@
   }
   
   header {
-    height: 160px;
+    height: 140px;
     display: flex;
     gap: 10px;
     flex-direction: column;
     align-items: center;
+
     > img {
-      margin-top: 10px;
+      margin: 10px;
       height: 60px;
     }
-    > input {
-      font-family: inherit;
-      font-size: inherit;
-      border: none;
-      border-radius: 8px;
-      background: #f0f0f0;
-      padding: 5px;
-      accent-color: #5fd1fb;
-    }
-    > button {
-      font-family: inherit;
-      font-size: inherit;
-      padding: 5px 20px;
-      color: #f0f0f0;
-      background: linear-gradient(90deg, rgba(95,209,251,1) 0%, rgba(69,103,231,1) 100%);
-      border: none;
-      border-radius: 100px;
+
+    .form {
+      display: flex;
+
+      > input {
+        font-family: inherit;
+        font-size: inherit;
+        border: none;
+        border-radius: 8px 0 0 8px;
+        background: #f0f0f0;
+        padding: 8px;
+        accent-color: #5fd1fb;
+      }
+
+      > button {
+        cursor: pointer;
+        font-family: inherit;
+        font-size: inherit;
+        padding: 8px 20px;
+        color: #f0f0f0;
+        background: linear-gradient(135deg, rgba(95,209,251,1) 0%, rgba(69,103,231,1) 100%);
+        border: none;
+        border-radius: 0 8px 8px 0;
+      }
     }
   }
 
   .wrapper {
-    margin: 0 20px;
+    padding: 20px;
     max-width: 100%;
-    height: calc(100vh - 230px);
+    box-sizing: border-box;
+    height: calc(100vh - 240px);
     overflow: scroll;
     scrollbar-width: thin;
   }
   
   footer {
     background: #f0f0f0;
-    height: 70px;
+    height: 100px;
+    .stats {
+      font-size: 14px;
+      color: #8497B0;
+      padding: 5px;
+    }
     > img {
       margin: 10px;
       height: 50px;
+    }
+  }
+
+  .window {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(255, 255, 255, 0.5);
+    display: grid;
+    align-items: center;
+    justify-content: center;
+
+    &__card {
+      width: 260px;
+      background: #ffffff;
+      border-radius: 6px;
+      box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.2);
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+
+      > h2 {
+        margin: 10px 0 20px 0;
+      }
+
+      &--tweet {
+        cursor: pointer;
+        color: #ffffff;
+        font-family: inherit;
+        font-size: inherit;
+        padding: 5px 20px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        border: 2px solid #54a6f3;
+        background: #54a6f3;
+        text-decoration: none;
+      }
+
+      &--close {
+        cursor: pointer;
+        font-family: inherit;
+        font-size: inherit;
+        padding: 5px 20px;
+        border-radius: 5px;
+        border: 2px solid #f0f0f0;
+        background: #ffffff;
+      }
     }
   }
 </style>
