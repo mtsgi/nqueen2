@@ -70,7 +70,7 @@
         const squares = board.map(
           row => row.map(item => item === 2 ? "🟦" : "⬜").join("")
         ).join("%0a");
-        tweetUrl = `https://twitter.com/intent/tweet?text=${n}-Queen%0a%0a${squares}`;
+        tweetUrl = `https://twitter.com/intent/tweet?text=${n} Queen%0a%0a${squares}`;
       }
 
       else if (fillCount === n * n) {
@@ -111,7 +111,7 @@
   {#if isCleared}
     <div class="window" transition:fade|local>
       <div class="window__card" transition:slide|local>
-        <h2>Cleared!</h2>
+        <h2>{n} Queen Cleared!</h2>
         <a
           href={tweetUrl}
           target="_blank"
