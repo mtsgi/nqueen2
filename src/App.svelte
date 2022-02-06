@@ -66,7 +66,7 @@
         });
       }
 
-      if (queenCount === n) {
+      if (queenCount === size) {
         isCleared = true;
         const squares = board.map(
           row => row.map(item => item === 2 ? "🟦" : "⬜").join("")
