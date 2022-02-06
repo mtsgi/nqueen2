@@ -4,12 +4,21 @@
   import type { putPosition } from "./types";
   export let board :number[][];
 
-  const dispatch = createEventDispatcher<{ put: putPosition }>();
+  const dispatch = createEventDispatcher<{
+    put: putPosition,
+    hover: putPosition,
+    leave: void
+  }>();
 
   const clickItem = (row: number, col: number) => {
-    console.log("clicked", row, col);
     dispatch("put", { row, col });
   }
+
+  const hoverItem = (row: number, col: number) => {
+    if (board[row][col] === 0) dispatch("hover", { row, col });
+  }
+
+  const leaveItem = () => dispatch("leave");
 </script>
 
 <div
@@ -21,6 +30,8 @@
       <div
         class="board__item"
         class:filled={item > 0}
+        on:mouseenter={() => hoverItem(row, col)}
+        on:mouseleave={leaveItem}
         on:click={() => clickItem(row, col)}
       >
         {#if item === 2}
@@ -43,14 +54,14 @@
     &__item {
       cursor: pointer;
       border-radius: 3px;
-      border: 2px solid #f0f0f0;
+      border: 2px solid #e0e0e0;
       line-height: 32px;
       transition: .2s all ease;
       transform: rotateX(180deg);
       color: #ffffff;
 
       &:hover {
-        border: 2px solid #d0d0d0;
+        border: 2px solid #a0a0a0;
       }
 
       &.filled {
