@@ -1,5 +1,14 @@
 <script lang="ts">
+  import { createEventDispatcher } from "svelte";
+  import type { putPosition } from "./types";
   export let board :number[][];
+
+  const dispatch = createEventDispatcher<{ put: putPosition }>();
+
+  const clickItem = (row: number, col: number) => {
+    console.log("clicked", row, col);
+    dispatch("put", { row, col });
+  }
 </script>
 
 <div
@@ -8,20 +17,46 @@
 >
   {#each board as array, row}
     {#each array as item, col}
-      <div>{item}</div>
+      <div
+        class="board__item"
+        class:filled={item > 0}
+        on:click={() => clickItem(row, col)}
+      >
+        {#if item === 2}
+          ♛
+        {/if}
+      </div>
     {/each}
   {/each}
 </div>
 
 <style lang="scss">
   .board {
-    background: #f8f8f8;
     display: grid;
     grid-auto-rows: 32px;
-    justify-content: center;
-    align-items: center;
-    max-width: 100%;
-    height: calc(100vh - 300px);
-    overflow: scroll;
+    gap: 8px;
+    justify-content: left;
+    align-items: stretch;
+    box-sizing: border-box;
+
+    &__item {
+      cursor: pointer;
+      border-radius: 3px;
+      border: 2px solid #f0f0f0;
+      line-height: 32px;
+
+      &:hover {
+        border: 2px solid #d0d0d0;
+      }
+
+      &.filled {
+        border: none;
+        background: #ffa2a2;
+
+        &:hover {
+          border: none
+        }
+      }
+    }
   }
 </style>
