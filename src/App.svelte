@@ -9,6 +9,7 @@
 
   let n = 4;
   let board: number[][] = [];
+  $: size = board.length;
 
   let queenCount = 0;
   let fillCount = 0;
@@ -40,8 +41,8 @@
       board[row][col] = 2;
       queenCount++;
       fillCount++;
-      const sr = Math.max(row + 1, n - row);
-      const sc = Math.max(col + 1, n - col);
+      const sr = Math.max(row + 1, size - row);
+      const sc = Math.max(col + 1, size - col);
       const loop = Math.max(sr, sc);
       console.log({ sr, sc, loop });
 
@@ -56,7 +57,7 @@
           [row + i, col],
           [row - i, col]
         ].forEach(([nrow, ncol]) => {
-          if (nrow < n && nrow >= 0 && ncol < n && ncol >= 0) {
+          if (nrow < size && nrow >= 0 && ncol < size && ncol >= 0) {
             if (board[nrow][ncol] === 0) {
               board[nrow][ncol] = 1;
               fillCount++;
@@ -70,10 +71,10 @@
         const squares = board.map(
           row => row.map(item => item === 2 ? "🟦" : "⬜").join("")
         ).join("%0a");
-        tweetUrl = `https://twitter.com/intent/tweet?text=${n} Queen%0a%0a${squares}`;
+        tweetUrl = `https://twitter.com/intent/tweet?text=${size} Queen%0a%0a${squares}`;
       }
 
-      else if (fillCount === n * n) {
+      else if (fillCount === size * size) {
         isFailed = true;
       }
     }
@@ -101,9 +102,9 @@
 
   <footer>
     <div class="stats">
-      Queen {queenCount}/{n}
+      Queen {queenCount}/{size}
       |
-      Filled {fillCount}/{n*n}
+      Filled {fillCount}/{size*size}
     </div>
     <img src={engine} alt="Queen Engine 3" />
   </footer>
